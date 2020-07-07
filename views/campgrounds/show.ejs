@@ -1,0 +1,87 @@
+<%- include("../partials/header") %>
+
+<div class ="container">
+	<div class="row">
+		<div class="col-sm-3">
+			<div id="map" style="height:50%; width:100%;"></div>
+		</div>
+		<div class="col-sm-9">
+
+			<div class="card">
+				<img class="card-img-top" src="<%= campground.image %>" alt="<%= campground.name %>">
+				<div class="card-body">
+				  <h5 class="card-title"><%= campground.name %></h5>
+				  <h4 class="pull-right">£<%= campground.price %>/night</h4>
+				  <p><%= campground.description %></p>
+				  <p>
+					  <em>Submitted by <%= campground.author.username %></em>
+				  </p>
+				  <% if(currentUser && campground.author.id.equals(currentUser._id)){ %>
+					  <a class="btn btn-warning" href="/campgrounds/<%= campground._id%>/edit">Edit</a>
+					  <form class="delete-form" action="/campgrounds/<%= campground._id %>?_method=DELETE" method="POST">
+					  <button class="btn btn-danger">Delete</button>
+					  </form>
+				  <% } %>
+				  <a href="/campgrounds/<%= campground._id %>" class="btn btn-primary">More Info</a>
+				</div>
+			  </div>
+
+			<div class="well">
+				<div class="text-right">
+					<a class="btn btn-success" href="/campgrounds/<%= campground._id %>/comments/new"> Add New Comment</a>
+				</div>
+				<hr>
+				<% campground.comments.forEach(function(comment) { %>
+				<div class="row">
+					<div class="col-sm-12">
+						<strong><%= comment.author.username %></strong>
+						<p>
+							<%= comment.text %> 
+						</p>
+						<% if(currentUser && comment.author.id.equals(currentUser._id)){ %>
+							<a class="btn btn-xs btn-warning" 
+							href="/campgrounds/<%=campground._id%>/comments/<%=comment._id%>/edit">
+							Edit
+							</a>
+							<form action="/campgrounds/<%=campground._id%>/comments/<%=comment._id%>?_method=DELETE" class="delete-form" method="POST">
+								<input type="submit" class="btn btn-xs btn-danger" value="Delete">
+							</form>
+						<% } %>
+					</div>
+			
+				</div> 
+				<% }) %>
+			</div>
+		</div>
+		
+	</div>
+	
+</div>
+
+
+<script>
+	function mapinit() {
+		var lat = <%= campground.lat %>;	
+		var lng = <%= campground.lng %>;
+		var center = {lat: lat, lng: lng };
+		
+		var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: center,
+        scrollwheel: false
+		});
+		var map=new google.maps.Map(document.getElementById("map"), map);
+
+		var marker = new google.maps.Marker({
+        position: center,
+		map: map
+		});
+	}
+	google.maps.event.addDomListener(window, 'load', mapinit);
+</script>
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBYOZLt_I-JxxCdU9YQczW8gbZVma8CwK4" async defer>
+</script>
+
+<%- include("../partials/footer") %>
